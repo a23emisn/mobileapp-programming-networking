@@ -1,42 +1,122 @@
 
 # Rapport
 
-**Skriv din rapport här!**
+The following is done in this task, the code follows further down.
 
-_Du kan ta bort all text som finns sedan tidigare_.
-
-## Följande grundsyn gäller dugga-svar:
-
-- Ett kortfattat svar är att föredra. Svar som är längre än en sida text (skärmdumpar och programkod exkluderat) är onödigt långt.
-- Svaret skall ha minst en snutt programkod.
-- Svaret skall inkludera en kort övergripande förklarande text som redogör för vad respektive snutt programkod gör eller som svarar på annan teorifråga.
-- Svaret skall ha minst en skärmdump. Skärmdumpar skall illustrera exekvering av relevant programkod. Eventuell text i skärmdumpar måste vara läsbar.
-- I de fall detta efterfrågas, dela upp delar av ditt svar i för- och nackdelar. Dina för- respektive nackdelar skall vara i form av punktlistor med kortare stycken (3-4 meningar).
-
-Programkod ska se ut som exemplet nedan. Koden måste vara korrekt indenterad då den blir lättare att läsa vilket gör det lättare att hitta syntaktiska fel.
+1. Added RecyclerView to layout.
+2. Created a new mountain class.
+3. Added `ArrayList<Mountain>` as a member variable in my activity.
+4. Created a mountain.xml 
+5. Defined the mountain class.
+6. Added a recyclerViewAdapter class, and created an instance in onCreate.
+7. Enabled internet access.
+8. In onPostExecute, I added a solution that unmarshalls the JSON using GSON, and defin
+es them as mountains.
 
 ```
-function errorCallback(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            // Geolocation API stöds inte, gör något
-            break;
-        case error.POSITION_UNAVAILABLE:
-            // Misslyckat positionsanrop, gör något
-            break;
-        case error.UNKNOWN_ERROR:
-            // Okänt fel, gör något
-            break;
+1.
+ <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+         app:layout_constraintRight_toRightOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+2. 
+
+3.
+    private ArrayList<Mountain> mountains = new ArrayList<>();
+
+4. 
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"/>
+
+</LinearLayout>
+
+5. 
+    private String ID;
+    private String name;
+    @SerializedName("cost")
+    private int feet;
+    @SerializedName("size")
+    private int meter;
+
+    public Mountain(String ID, String name, int feet, int meter) {
+        this.ID = ID;
+        this.name = name;
+        this.feet = feet;
+        this.meter = meter;
     }
-}
+
+    public String getID() {
+        return ID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getFeet() {
+        return feet;
+    }
+
+    public int getMeter() {
+        return meter;
+    }
+
+    public void setID(String ID) {
+        this.ID = ID;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setFeet(int feet) {
+        this.feet = feet;
+    }
+
+    public void setMeter(int meter) {
+        this.meter = meter;
+    }
+    
+6. 
+       adapter = new RecyclerViewAdapter(this, mountains, new RecyclerViewAdapter.OnClickListener() {
+            @Override
+            public void onClick(Mountain mountain) {
+                Toast.makeText(MainActivity.this, mountain.getName(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        RecyclerView view = findViewById(R.id.recycler_view);
+        view.setLayoutManager(new LinearLayoutManager(this));
+        view.setAdapter(adapter);
+
+        String url = "https://mobprog.webug.se/json-api?login=brom";
+        new JsonTask(this).execute(url);
+        
+7. 
+    <uses-permission android:name="android.permission.INTERNET" />
+
+8.
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Mountain>>() {}.getType();
+        ArrayList<Mountain> listOfMountains = gson.fromJson(json, type);
+        mountains.addAll(listOfMountains);
+        adapter.notifyDataSetChanged();
 ```
 
-Bilder läggs i samma mapp som markdown-filen.
+![](Screenshot_20240425_151319.png)
 
-![](android.png)
-
-Läs gärna:
-
-- Boulos, M.N.K., Warren, J., Gong, J. & Yue, P. (2010) Web GIS in practice VIII: HTML5 and the canvas element for interactive online mapping. International journal of health geographics 9, 14. Shin, Y. &
-- Wunsche, B.C. (2013) A smartphone-based golf simulation exercise game for supporting arthritis patients. 2013 28th International Conference of Image and Vision Computing New Zealand (IVCNZ), IEEE, pp. 459–464.
-- Wohlin, C., Runeson, P., Höst, M., Ohlsson, M.C., Regnell, B., Wesslén, A. (2012) Experimentation in Software Engineering, Berlin, Heidelberg: Springer Berlin Heidelberg.
